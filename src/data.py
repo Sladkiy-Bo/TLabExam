@@ -1,4 +1,3 @@
-# src/data.py
 """
 Загрузка KION, временной сплит, фильтрация холодных юзеров/айтемов.
 Запуск: python data.py
@@ -22,7 +21,7 @@ def load_raw():
     users = pd.read_csv(DATA_RAW / 'users_en.csv')
     items = pd.read_csv(DATA_RAW / 'items_en.csv')
 
-    # Чистим: 828 строк с пропуском в watched_pct (0.015%) — выкидываем
+    # 828 строк с пропуском в watched_pct (0.015%) — очень мало, можно выкинуть
     n_before = len(interactions)
     interactions = interactions.dropna(subset=['watched_pct']).reset_index(drop=True)
     print(f"[load_raw] Удалено {n_before - len(interactions)} строк с NaN в watched_pct")
@@ -124,10 +123,6 @@ def main():
     t1 = dates[0.70]
     t2 = dates[0.80]
     print(f"\nАвтосплит: T1 = {t1.date()}, T2 = {t2.date()}")
-
-    # Если хочешь задать вручную — раскомментируй:
-    # t1 = pd.Timestamp('2021-07-01')
-    # t2 = pd.Timestamp('2021-07-20')
 
     print("\n" + "=" * 60)
     print("Сплит до фильтрации")
