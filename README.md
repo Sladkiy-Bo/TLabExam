@@ -148,8 +148,15 @@ K считается по *полному каталогу*, без сэмпли
 
 ---
 
-## 6-10
-
+## 6. Базовая GPT-2 (next item prediction)
+### TO_DO
+## 7. Reward Model
+### TO_DO
+## 8. RL-дообучение
+### TO_DO
+## 9. Анализ
+### TO_DO
+## 10. Ограничения
 ### TO_DO
 
 ## 11. Воспроизведение
@@ -182,6 +189,7 @@ jupyter notebook notebooks/
 
 ## 12. Структура репозитория
 
+```test
 TLabExam/
 ├── data/
 │   ├── raw/                # исходные CSV (не коммитятся)
@@ -199,3 +207,4 @@ TLabExam/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+```
