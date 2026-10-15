@@ -1,114 +1,139 @@
+# src/metrics.py
 """
 Метрики ранжирования для оценки рекомендательных моделей.
-Все три метрики работают по одной схеме:
-    preds  — отсортированный список item_id (от лучшего к худшему)
-    target — истинный item_id, который пользователь реально посмотрел следующим
-    k      — ограничение по длине списка
+
+Протокол оценки:
+    - Таргет = все взаимодействия пользователя в ПЕРВЫЙ активный день
+      в соответствующем сплите (val или test).
+    - Контекст для val  = история пользователя в train.
+    - Контекст для test = история пользователя в train + val.
+    - Метрики считаются per-target: если у юзера 3 таргета, каждый даёт вклад.
 """
 
 import numpy as np
 import pandas as pd
 
 
-# ---------- Метрики одного пользователя ----------
+#  Метрики одного таргета
 
 def recall_at_k(preds, target, k):
-    """
-    Recall@K (для одного юзера) = 1.0, если истинный айтем попал в топ-K, иначе 0.0.
-    Поскольку у каждого юзера ровно один правильный ответ, это просто hit@K.
-    """
+    """1.0, если истинный айтем попал в топ-K, иначе 0.0."""
     return 1.0 if target in preds[:k] else 0.0
 
 
 def ndcg_at_k(preds, target, k):
-    """
-    NDCG@K — как Recall, но с дисконтом по позиции.
-    Попал на 1-е место → 1.0, на 2-е → 1/log2(3) ≈ 0.63, на 3-е → 1/log2(4) = 0.5 и т.д.
-    Поощряет модели, которые ставят правильный айтем в начало списка.
-    """
+    """NDCG@K для одного таргета: 1/log2(rank+1), 0 если мимо."""
     for i, p in enumerate(preds[:k]):
         if p == target:
-            return 1.0 / np.log2(i + 2)   # i начинается с 0 → i+2 даёт 2, 3, 4, ...
+            return 1.0 / np.log2(i + 2)   # i начинается с 0 → i+2 = позиция с 1
     return 0.0
 
 
 def average_precision_at_k(preds, target, k):
-    """
-    AP@K (для одного юзера) — 1 / (позиция истинного айтема), если он попал в топ-K.
-    Усреднённый AP по всем юзерам = MAP@K.
-    Для нашего случая (один таргет на юзера) это просто 1/rank.
-    """
+    """AP@K для одного таргета: 1/(rank), 0 если мимо."""
     for i, p in enumerate(preds[:k]):
         if p == target:
             return 1.0 / (i + 1)
     return 0.0
 
 
-# ---------- Подготовка таргетов ----------
+#  Построение таргетов и контекста
 
-def build_test_targets(test_df, one_per_user=True):
+def build_eval_targets(split_df):
     """
-    Строит таргеты для оценки: один (или все) item_id на пользователя.
+    Возвращает все взаимодействия пользователя в его ПЕРВЫЙ активный день
+    в данном сплите.
 
-    one_per_user=True (стандартный протокол next-item):
-        для каждого юзера берём ПОСЛЕДНИЙ по времени просмотр в test
-        → ровно один таргет на юзера.
+    Параметры:
+        split_df — DataFrame (val или test) с колонками user_id, item_id, last_watch_dt
 
-    one_per_user=False:
-        вернёт все взаимодействия из test → оценка по всем событиям
-        (дороже, но информативнее).
+    Возвращает:
+        DataFrame с колонками [user_id, item_id, last_watch_dt] — все таргеты.
 
-    Важно: сортируем по last_watch_dt перед groupby, иначе .tail(1)
-    вернёт случайную строку, а не последнюю по времени.
+    Почему «первый активный день»:
+        - Между концом предыдущего сплита и началом текущего проходит время.
+        - «Последний таргет» может быть через 3 недели — модель не может его угадать.
+        - «Первый активный день» — это первое действие пользователя после последнего
+          действия в истории. Это ближе к сценарию реальной рекомендации.
     """
-    df = test_df.sort_values('last_watch_dt')
-    if one_per_user:
-        df = df.groupby('user_id').tail(1)
-    return df[['user_id', 'item_id']].reset_index(drop=True)
+    df = split_df.copy()
+    first_day = (df.groupby('user_id')['last_watch_dt']
+                   .min()
+                   .rename('first_day'))
+    df = df.merge(first_day, on='user_id')
+    targets = df[df['last_watch_dt'] == df['first_day']]
+    targets = targets[['user_id', 'item_id', 'last_watch_dt']].reset_index(drop=True)
+    return targets
 
 
-# ---------- Главный цикл оценки ----------
+def build_context(train_df, val_df=None):
+    """
+    Возвращает историю каждого пользователя.
+    Для оценки на val:   build_context(train)
+    Для оценки на test:  build_context(train, val)
+    """
+    if val_df is not None:
+        df = pd.concat([train_df, val_df], ignore_index=True)
+    else:
+        df = train_df.copy()
 
-def evaluate_model(predict_fn, targets_df, k_values=(10, 50, 100), verbose=True):
+    df = df.sort_values(['user_id', 'last_watch_dt'])
+
+    grouped = df.groupby('user_id')
+    items_by_user = grouped['item_id'].apply(list).to_dict()
+    last_date_by_user = grouped['last_watch_dt'].max().to_dict()
+
+    context = {
+        u: {'items': items_by_user[u], 'last_date': last_date_by_user[u]}
+        for u in items_by_user
+    }
+    return context
+
+
+#  Главный цикл оценки
+
+def evaluate_model(predict_fn, targets_df, context, k_values=(10, 50, 100), verbose=True):
     """
     Оценивает модель на таргетах.
 
     Параметры:
-        predict_fn — функция: user_id → отсортированный список item_id
-                     (это универсальный интерфейс для всех моделей:
-                      популярное, last-item, GPT-2 — все дают этот интерфейс)
-        targets_df — DataFrame с колонками user_id, item_id (см. build_test_targets)
-        k_values   — для каких K считать метрики
-        verbose    — печатать прогресс каждые 10 000 юзеров
+        predict_fn  — функция(user_id, context_items, context_last_date) -> list[item_id]
+        targets_df  — DataFrame с колонками [user_id, item_id]
+        context     — dict, см. build_context
+        k_values    — tuple K для метрик
+        verbose     — печатать прогресс
 
     Возвращает:
-        dict {metric_name: value}, например {'Recall@10': 0.034, 'NDCG@10': 0.018, ...}
+        dict {metric_name: mean_value}, усреднённое по всем (user, target) парам.
     """
     max_k = max(k_values)
 
-    # Списки, куда будем складывать метрики каждого юзера
     accum = {}
     for k in k_values:
         accum[f'Recall@{k}'] = []
         accum[f'NDCG@{k}'] = []
         accum[f'MAP@{k}'] = []
 
+    n = len(targets_df)
     users = targets_df['user_id'].values
     items = targets_df['item_id'].values
-    n = len(users)
 
     for i, (user_id, target) in enumerate(zip(users, items)):
-        # Получаем рекомендации модели (только первые max_k нужны)
-        preds = predict_fn(user_id)[:max_k]
+        user_ctx = context.get(user_id)
+        if user_ctx is None:
+            # Нет истории — модель получит пустой контекст
+            ctx_items, ctx_date = [], None
+        else:
+            ctx_items, ctx_date = user_ctx['items'], user_ctx['last_date']
 
-        # Считаем метрики для каждого K
+        preds = predict_fn(user_id, ctx_items, ctx_date)[:max_k]
+
         for k in k_values:
             accum[f'Recall@{k}'].append(recall_at_k(preds, target, k))
             accum[f'NDCG@{k}'].append(ndcg_at_k(preds, target, k))
             accum[f'MAP@{k}'].append(average_precision_at_k(preds, target, k))
 
-        if verbose and (i + 1) % 10000 == 0:
+        if verbose and (i + 1) % 50000 == 0:
             print(f"  обработано {i + 1:,}/{n:,}")
 
-    # Усредняем по всем юзерам
     return {k: float(np.mean(v)) for k, v in accum.items()}
