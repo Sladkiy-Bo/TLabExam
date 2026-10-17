@@ -1,6 +1,10 @@
 # Data
 data/raw/*.csv
 data/processed/*.parquet
+results/checkpoints/epoch_1.pt
+results/checkpoints/epoch_2.pt
+results/checkpoints/epoch_3.pt
+results/checkpoints_test/
 
 # Python
 __pycache__/
