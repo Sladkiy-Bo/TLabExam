@@ -1,4 +1,3 @@
-# src/metrics.py
 """
 Метрики ранжирования для оценки рекомендательных моделей.
 
@@ -137,3 +136,46 @@ def evaluate_model(predict_fn, targets_df, context, k_values=(10, 50, 100), verb
             print(f"  обработано {i + 1:,}/{n:,}")
 
     return {k: float(np.mean(v)) for k, v in accum.items()}
+
+
+# update
+
+def wrap_with_mask(predict_fn):
+    """
+    Оборачивает predict_fn так, что просмотренные айтемы исключаются
+    из результата.
+
+    Использование:
+        masked_pop = wrap_with_mask(popularity_baseline(train))
+        metrics = evaluate_model(masked_pop, targets, context)
+    """
+    def predict(user_id, context_items, context_last_date):
+        seen = set(context_items)
+        preds = predict_fn(user_id, context_items, context_last_date)
+        return [x for x in preds if x not in seen]
+    return predict
+
+
+def pad_predictions(predict_fn, fallback, total_k=100):
+    """
+    Оборачивает predict_fn: если после маскировки осталось меньше total_k
+    айтемов, добивает fallback-списком.
+
+    Нужно, потому что после маскировки топ-200 может стать топ-150,
+    а метрики считаются до K=100.
+    """
+    def predict(user_id, context_items, context_last_date):
+        seen = set(context_items)
+        preds = predict_fn(user_id, context_items, context_last_date)
+        # Маска уже применена в predict_fn или снаружи
+        if len(preds) >= total_k:
+            return preds[:total_k]
+        # Добиваем fallback
+        preds_set = set(preds)
+        for item in fallback:
+            if item not in seen and item not in preds_set:
+                preds.append(item)
+                if len(preds) >= total_k:
+                    break
+        return preds
+    return predict

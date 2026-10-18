@@ -1,4 +1,3 @@
-# src/baselines.py
 """
 Классические бейзлайны для сравнения с GPT-2
 (теперь 4: Popularity, Recent-Popularity, Item-kNN и Last-Item).
@@ -17,12 +16,10 @@ from collections import Counter, defaultdict
 
 #  Popularity — глобальный топ-N
 
-def popularity_baseline(train, top_n=200):
+def popularity_baseline(train, top_n=500):
     """
-    Топ-N самых популярных айтемов за весь train.
-    Для всех пользователей возвращает один и тот же список.
-
-    Самый простой бейзлайн — нижняя планка.
+    Топ-N популярных, с маскировкой просмотренного.
+    top_n=500 (вместо 200), чтобы после маскировки осталось >= 100.
     """
     popular = (train.groupby('item_id')
                     .size()
@@ -32,7 +29,33 @@ def popularity_baseline(train, top_n=200):
                     .tolist())
 
     def predict(user_id, context_items, context_last_date):
-        return popular
+        seen = set(context_items) if context_items else set()
+        return [x for x in popular if x not in seen]
+
+    return predict
+
+
+def recent_popularity_at_cutoff(train, cutoff, window_days=14, top_n=500):
+    """
+    Recent-popularity: топ за window_days ДО cutoff (фиксированная граница сплита).
+    Для всех юзеров один и тот же список (см. замечание Claude П2).
+
+    cutoff — pd.Timestamp граница сплита (T1 для val, T2 для test).
+    """
+    cutoff = pd.Timestamp(cutoff)
+    start = cutoff - pd.Timedelta(days=window_days)
+    window = train[(train['last_watch_dt'] >= start) &
+                   (train['last_watch_dt'] < cutoff)]
+    top = (window.groupby('item_id')
+                 .size()
+                 .sort_values(ascending=False)
+                 .head(top_n)
+                 .index
+                 .tolist())
+
+    def predict(user_id, context_items, context_last_date):
+        seen = set(context_items) if context_items else set()
+        return [x for x in top if x not in seen]
 
     return predict
 
@@ -94,7 +117,7 @@ def recent_popularity_baseline(train, window_days=14, top_n=200):
 
 #  Last-Item с популярным fallback
 
-def last_item_baseline(train, top_n=200):
+def last_item_baseline(train, top_n=500):
     """
     Рекомендует последний просмотренный айтем + популярные для заполнения.
 
@@ -116,12 +139,20 @@ def last_item_baseline(train, top_n=200):
                     .tolist())
 
     def predict(user_id, context_items, context_last_date):
-        seen = last_item.get(user_id)
-        if seen is None:
-            return popular
-        rest = [x for x in popular if x != seen]
-        return [seen] + rest
-
+        seen = set(context_items) if context_items else set()
+        seen_and_result = set(seen)  # ← ключевой фикс
+        last = last_item.get(user_id)
+        result = []
+        if last is not None and last not in seen:
+            result.append(last)
+            seen_and_result.add(last)
+        for x in popular:
+            if x not in seen_and_result:
+                result.append(x)
+                seen_and_result.add(x)
+                if len(result) >= top_n:
+                    break
+        return result
     return predict
 
 
@@ -140,15 +171,14 @@ def pure_last_item_baseline(train):
                              .to_dict())
 
     def predict(user_id, context_items, context_last_date):
-        seen = last_item.get(user_id)
-        return [seen] if seen is not None else []
-
+        last = last_item.get(user_id)
+        return [last] if last is not None else []
     return predict
 
 
 #  Item-kNN — «пользователи, которые смотрели X, часто смотрят Y»
 
-def item_knn_baseline(train, top_k_similar=50, top_n=200, max_history=20):
+def item_knn_baseline(train, top_k_similar=50, top_n=500, max_history=20):
     """
     Item-to-item collaborative filtering.
 

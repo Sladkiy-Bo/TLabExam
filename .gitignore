@@ -4,6 +4,11 @@ data/processed/*.parquet
 results/checkpoints/epoch_1.pt
 results/checkpoints/epoch_2.pt
 results/checkpoints/epoch_3.pt
+results/checkpoints_v2/epoch_1.pt
+results/checkpoints_v2/epoch_2.pt
+results/checkpoints_v2/epoch_3.pt
+results/checkpoints_v2/epoch_4.pt
+results/checkpoints_v2/epoch_5.pt
 results/checkpoints_test/
 
 # Python
