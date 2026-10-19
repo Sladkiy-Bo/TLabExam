@@ -702,7 +702,7 @@ TLabExam/
 │   ├── raw/                          # исходные CSV (не коммитятся)
 │   └── processed/                    # train/val/test.parquet + *_targets.parquet
 ├── notebooks/
-│   ├── _legacy/                      # устаревшие версии
+│   ├── _legacy/                      # устаревшие версии протокола
 │   │   ├── 02_baselines_v1.ipynb
 │   │   ├── 04_baselines_v2.ipynb
 │   │   └── 08_eval_gpt2_v2.ipynb
@@ -713,7 +713,9 @@ TLabExam/
 │   ├── 07_train.ipynb                # обучение GPT-2 v1 (базовая)
 │   ├── 09_rm_index_test.ipynb        # проверка RM-индекса
 │   ├── 10_protocol_v3_final.ipynb    # ФИНАЛЬНЫЙ протокол: все бейзлайны + GPT-2 v1
-│   └── 11_train_v2.ipynb             # обучение GPT-2 v2 (финальная)
+│   ├── 11_train_v2.ipynb             # обучение GPT-2 v2 (финальная)
+│   ├── 12_rm_model_test.ipynb        # проверка архитектуры Reward Model
+│   └── 13_rm_train.ipynb             # обучение RM v1/v2 + диагностика признаков
 ├── src/
 │   ├── data.py                       # загрузка + временной сплит + фильтр
 │   ├── metrics.py                    # Recall/NDCG/MAP + build_eval_targets
@@ -722,14 +724,20 @@ TLabExam/
 │   ├── model.py                      # GPT-2 wrapper
 │   ├── train.py                      # цикл обучения GPT-2
 │   ├── my_evaluate.py                # GPT2Predictor + evaluate_gpt2_fast
-│   └── rm_index.py                   # numpy-индекс для Reward Model
+│   ├── rm_index.py                   # numpy-индекс для Reward Model
+│   ├── reward_model.py               # RewardModel (two-tower) + create_reward_model
+│   ├── rm_baselines.py               # бейзлайны RM: global/item/user/additive
+│   └── rm_train.py                   # цикл обучения RM + evaluate_regression
 ├── results/
 │   ├── baselines_v3_masked.csv       # метрики бейзлайнов (protocol v3)
 │   ├── final_v3_with_v2.csv          # финальная таблица: бейзлайны + GPT-2 v1/v2
 │   ├── baselines_v3_masked.png       # график бейзлайнов
 │   ├── training_curves_v2.png        # кривые обучения GPT-2 v2
+│   ├── rm_training_curves_v2.png     # кривые обучения RM v2
 │   ├── checkpoints/                  # GPT-2 v1 (best_model.pt)
-│   └── checkpoints_v2/               # GPT-2 v2 (best_model.pt, history.json)
+│   ├── checkpoints_v2/               # GPT-2 v2 (best_model.pt, history.json)
+│   ├── checkpoints_rm/               # RM v1 (архивная, для сравнения)
+│   └── checkpoints_rm_v2/            # RM v2 (best_model.pt, history.json) — финальная
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -739,13 +747,15 @@ TLabExam/
 
 | Notebook | Что делает | Артефакты |
 |----------|------------|-----------|
-| `01_eda.ipynb` | Разведочный анализ данных | - |
-| `03_protocol_eda.ipynb` | EDA для протокола: repeat rate = 0%, активные дни, распределение наград | - |
-| `05_dataset_test.ipynb` | Проверка `NextItemDataset` | - |
-| `06_model_test.ipynb` | Проверка `GPT-2 wrapper` | - |
+| `01_eda.ipynb` | Разведочный анализ данных | — |
+| `03_protocol_eda.ipynb` | EDA для протокола: repeat rate = 0%, активные дни, распределение наград | — |
+| `05_dataset_test.ipynb` | Проверка `NextItemDataset` | — |
+| `06_model_test.ipynb` | Проверка `GPT-2 wrapper` | — |
 | `07_train.ipynb` | Обучение GPT-2 v1 (3 эпохи, val loss) | `checkpoints/best_model.pt` |
-| `09_rm_index_test.ipynb` | Проверка `RMIndex` + EDA награды | - |
+| `09_rm_index_test.ipynb` | Проверка `RMIndex` + EDA награды | — |
 | **`10_protocol_v3_final.ipynb`** | **Финальный протокол**: маскировка, Recent-Pop от cutoff, все бейзлайны + GPT-2 v1 | `baselines_v3_masked.csv` |
 | **`11_train_v2.ipynb`** | **GPT-2 v2**: early stop по NDCG@10, +5 эпох, оценка v1 vs v2 | `checkpoints_v2/`, `final_v3_with_v2.csv`, `training_curves_v2.png` |
+| `12_rm_model_test.ipynb` | Проверка архитектуры Reward Model (two-tower) | — |
+| **`13_rm_train.ipynb`** | **Reward Model**: бейзлайны, диагностика признаков (residual variance, total_dur, табличные), обучение v1 и v2 | `checkpoints_rm/`, `checkpoints_rm_v2/`, `rm_training_curves_v2.png` |
 
-> Ноутбуки `_legacy/` - ранние версии протокола (v1, v2). Не используются для финальных сравнений. Оставлены для истории.
+> Ноутбуки `_legacy/` — ранние версии протокола (v1, v2). Не используются для финальных сравнений. Оставлены для истории.
