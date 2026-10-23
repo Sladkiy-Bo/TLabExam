@@ -1231,7 +1231,7 @@ cd src && python data.py && cd ..
 ```
 
 | Шаг | Ноутбук | Что обучает |
-|---|---|---|---|
+|---|---|---|
 | 1 | `07_train.ipynb` | GPT-2 v1 (baseline) |
 | 2 | `11_train_v2.ipynb` | GPT-2 v2 (π_ref) |
 | 3 | `13_rm_train.ipynb` | Reward Model v1 + v2 |
