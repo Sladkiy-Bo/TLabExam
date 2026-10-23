@@ -1175,19 +1175,51 @@ RL-дообучение (GRPO-подобный контекстный банди
 ---
 
 ## 12. Воспроизведение
+
+Два независимых сценария:
+
+- **12.1 — Быстрая проверка (2–5 мин).** Убедиться, что числа в README воспроизводятся из сохранённых чекпоинтов. Обучение с нуля не выполняется.
+- **12.2 — Полный пайплайн (часы, GPU).** Воспроизвести обучение всех моделей с нуля.
+
+Если цель — проверить результаты, начните с 12.1. 12.2 нужен, только если планируется менять код, данные или гиперпараметры.
+
+---
+
+### 12.1. Быстрая проверка воспроизводимости
+
+**Что делает.** Загружает сохранённые чекпоинты (`results/checkpoints_v2/`, `results/checkpoints_rm_v2/`, `results/checkpoints_rl_*`, `results/checkpoints_judge/`), оценивает их на тестовой выборке по протоколу из §4 и сверяет с числами README §5, §6, §7.5, §8.4. В конце печатает сводную таблицу по каждой метрике и сохраняет `results/repro_cache/repro_report.json`.
+
+
 ```bash
-# 1. Клонировать репозиторий
+# 1. Клонировать репозиторий и установить зависимости
 git clone https://github.com/Sladkiy-Bo/TLabExam
 cd TLabExam
-
-# 2. Виртуальное окружение
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-
-# 3. Установить зависимости
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-# 4. Скачать датасет (см. раздел 2)
+# 2. Убедиться, что в репозитории есть чекпоинты
+ls results/checkpoints_v2/best_model.pt \
+   results/checkpoints_rm_v2/best_model.pt \
+   results/checkpoints_judge/judge.txt \
+   results/checkpoints_judge/judge.pkl
+# Если файлов нет — см. 12.2, чекпоинты придётся обучить заново.
+
+# 3. Запустить проверку
+jupyter nbconvert --to notebook --execute notebooks/21_results.ipynb \
+  --output 21_results_executed.ipynb
+# или открыть notebooks/21_results.ipynb в Jupyter:
+#   Kernel -> Restart & Run All
+```
+
+### 12.2. Полный пайплайн (обучение с нуля)
+
+Нужен, только если планируется воспроизвести обучение или изменить код. Требуется GPU; суммарное время — десятки часов.
+
+```bash
+# 1–3. Клонирование, venv, зависимости — как в 12.1
+
+# 4. Скачать датасет (см. пункт 2)
 curl -L -o data/raw/data_en.zip \
   https://github.com/irsafilo/KION_DATASET/raw/f69775be31fa5779907cf0a92ddedb70037fb5ae/data_en.zip
 unzip data/raw/data_en.zip -d data/raw/
@@ -1195,9 +1227,28 @@ unzip data/raw/data_en.zip -d data/raw/
 # 5. Подготовить сплиты
 cd src && python data.py && cd ..
 
-# 6. Запустить ноутбуки
-jupyter notebook notebooks/
+# 6. Обучить модели в указанном порядке
 ```
+
+| Шаг | Ноутбук | Что обучает |
+|---|---|---|---|
+| 1 | `07_train.ipynb` | GPT-2 v1 (baseline) |
+| 2 | `11_train_v2.ipynb` | GPT-2 v2 (π_ref) |
+| 3 | `13_rm_train.ipynb` | Reward Model v1 + v2 |
+| 4 | `14_rl_train.ipynb` | R0, свип по β |
+| 5 | `15_judge.ipynb` | LightGBM-судья |
+| 6 | `16_rl_train_r2.ipynb` | R2 |
+| 7 | `17_rl_train_r3.ipynb` | R3, свип по (λ, β) |
+
+После шагов 2–7 можно запускать анализ:
+
+| Ноутбук | Что делает | Требует |
+|---|---|---|
+| `18_multistep.ipynb` | Мультишаговая генерация, exposure bias | π_ref, R0, R3 |
+| `19_profile.ipynb` | Diversity, Gini, top-10 dominance | π_ref, R0, R3 |
+| `20_bootstrap.ipynb` | Paired bootstrap CI | π_ref, R0, R3 |
+
+Диагностические ноутбуки `01`, `03`, `05`, `06`, `09`, `12` для воспроизведения результатов не нужны — они проверяют отдельные компоненты `src/` и EDA.
 
 ---
 
@@ -1229,7 +1280,8 @@ TLabExam/
 │   ├── 17_rl_train_r3.ipynb          # R3: Reward + λ*log π_ref
 │   ├── 18_multistep.ipynb            # мультишаговая генерация (5 шагов, сэмплирование)
 │   ├── 19_profile.ipynb              # профиль рекомендаций + диагностика айтемов
-│   └── 20_bootstrap.ipynb             # paired bootstrap CI для NDCG и reward
+│   ├── 20_bootstrap.ipynb             # paired bootstrap CI для NDCG и reward
+│   └── 21_results.ipynb             # Запуск быстрого анализа (без повторного обучения)
 ├── src/
 │   ├── data.py                       # загрузка + временной сплит + фильтр
 │   ├── metrics.py                    # Recall/NDCG/MAP + build_eval_targets
@@ -1286,9 +1338,11 @@ TLabExam/
 │   │    ├── profile_comparison.png    # 6 графиков профиля
 │   │    └── profile_full.pkl          # полные данные + диагностика айтемов
 │   └── bootstrap_results/
-│       ├── bootstrap_summary.csv     # 95% CI для NDCG, Judge, RM reward
-│       ├── bootstrap_cis.png         # визуализация CIs
-│       └── test_preds_cache.pkl      # кэш предсказаний (10-15 мин при первом запуске)
+│   │    ├── bootstrap_summary.csv     # 95% CI для NDCG, Judge, RM reward
+│   │    ├── bootstrap_cis.png         # визуализация CIs
+│   │    └── test_preds_cache.pkl      # кэш предсказаний (10-15 мин при первом запуске)
+│   └── repro_cache/
+│        └── repro_report.json      # результаты быстрой проверки
 ├── requirements.txt
 ├── .gitignore
 └── README.md

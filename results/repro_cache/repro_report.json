@@ -1,0 +1,328 @@
+{
+  "timestamp": "2026-10-24T02:19:10",
+  "subset": 10000,
+  "verdict": "PASSED",
+  "n_pass": 35,
+  "n_fail": 0,
+  "n_skip": 0,
+  "total": 35,
+  "vocab_source": "build_item_vocab(train_df)",
+  "vocab_size": 14937,
+  "checks": [
+    {
+      "section": "baselines",
+      "metric": "Popularity \u00b7 NDCG@10",
+      "expected": 0.1032,
+      "actual": 0.10565617951308046,
+      "tol": 0.1,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Popularity \u00b7 NDCG@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1032, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1057  (\u0394 = +2.4%)"
+    },
+    {
+      "section": "baselines",
+      "metric": "Popularity \u00b7 Recall@10",
+      "expected": 0.1726,
+      "actual": 0.1754,
+      "tol": 0.1,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Popularity \u00b7 Recall@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1726, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1754  (\u0394 = +1.6%)"
+    },
+    {
+      "section": "baselines",
+      "metric": "Recent-Popularity \u00b7 NDCG@10",
+      "expected": 0.1229,
+      "actual": 0.12603898051882903,
+      "tol": 0.1,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Recent-Popularity \u00b7 NDCG@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1229, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1260  (\u0394 = +2.6%)"
+    },
+    {
+      "section": "baselines",
+      "metric": "Recent-Popularity \u00b7 Recall@10",
+      "expected": 0.223,
+      "actual": 0.2262,
+      "tol": 0.1,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Recent-Popularity \u00b7 Recall@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.2230, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.2262  (\u0394 = +1.4%)"
+    },
+    {
+      "section": "baselines",
+      "metric": "Item-kNN \u00b7 NDCG@10",
+      "expected": 0.1091,
+      "actual": 0.11181300951536036,
+      "tol": 0.1,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Item-kNN \u00b7 NDCG@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1091, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1118  (\u0394 = +2.5%)"
+    },
+    {
+      "section": "baselines",
+      "metric": "Item-kNN \u00b7 Recall@10",
+      "expected": 0.1842,
+      "actual": 0.19,
+      "tol": 0.1,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Item-kNN \u00b7 Recall@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1842, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1900  (\u0394 = +3.1%)"
+    },
+    {
+      "section": "base (\u03c0_ref, = gpt2_v2)",
+      "metric": "NDCG@10",
+      "expected": 0.1304,
+      "actual": 0.1328488347301707,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "NDCG@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1304, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1328  (\u0394 = +1.9%)"
+    },
+    {
+      "section": "base (\u03c0_ref, = gpt2_v2)",
+      "metric": "Recall@10",
+      "expected": 0.2192,
+      "actual": 0.2245,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Recall@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.2192, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.2245  (\u0394 = +2.4%)"
+    },
+    {
+      "section": "base (\u03c0_ref, = gpt2_v2)",
+      "metric": "MAP@10",
+      "expected": 0.103,
+      "actual": 0.10457746031746033,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "MAP@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1030, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1046  (\u0394 = +1.5%)"
+    },
+    {
+      "section": "base (\u03c0_ref, = gpt2_v2)",
+      "metric": "RM_reward_top10",
+      "expected": 0.5092,
+      "actual": 0.5114923715591431,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "RM_reward_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.5092, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.5115  (\u0394 = +0.5%)"
+    },
+    {
+      "section": "base (\u03c0_ref, = gpt2_v2)",
+      "metric": "Judge_reward_top10",
+      "expected": 0.4817,
+      "actual": 0.48033627451671235,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Judge_reward_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.4817, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.4803  (\u0394 = +0.3%)"
+    },
+    {
+      "section": "base (\u03c0_ref, = gpt2_v2)",
+      "metric": "Mean_item_mean_top10",
+      "expected": 0.485,
+      "actual": 0.4861410869565968,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Mean_item_mean_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.4850, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.4861  (\u0394 = +0.2%)"
+    },
+    {
+      "section": "gpt2_v2",
+      "metric": "NDCG@50",
+      "expected": 0.1638,
+      "actual": 0.1654103216096933,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "NDCG@50: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1638, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1654  (\u0394 = +1.0%)"
+    },
+    {
+      "section": "gpt2_v2",
+      "metric": "NDCG@100",
+      "expected": 0.178,
+      "actual": 0.17903247428843952,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "NDCG@100: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1780, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1790  (\u0394 = +0.6%)"
+    },
+    {
+      "section": "rm_v2",
+      "metric": "MAE",
+      "expected": 0.3308,
+      "actual": 0.33075252175331116,
+      "tol": 0.1,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "MAE: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.3308, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.3308  (\u0394 = +0.0%)"
+    },
+    {
+      "section": "rm_v2",
+      "metric": "RMSE",
+      "expected": 0.3816,
+      "actual": 0.3816326856613159,
+      "tol": 0.1,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "RMSE: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.3816, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.3816  (\u0394 = +0.0%)"
+    },
+    {
+      "section": "rm_v2",
+      "metric": "R2",
+      "expected": 0.0609,
+      "actual": 0.06086456775665283,
+      "tol": 0.2,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "R2: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.0609, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.0609  (\u0394 = +0.1%)"
+    },
+    {
+      "section": "r0",
+      "metric": "NDCG@10",
+      "expected": 0.129,
+      "actual": 0.13240792858809286,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "NDCG@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1290, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1324  (\u0394 = +2.6%)"
+    },
+    {
+      "section": "r0",
+      "metric": "Recall@10",
+      "expected": 0.2179,
+      "actual": 0.2244,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Recall@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.2179, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.2244  (\u0394 = +3.0%)"
+    },
+    {
+      "section": "r0",
+      "metric": "MAP@10",
+      "expected": 0.1016,
+      "actual": 0.10401785714285716,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "MAP@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1016, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1040  (\u0394 = +2.4%)"
+    },
+    {
+      "section": "r0",
+      "metric": "RM_reward_top10",
+      "expected": 0.5502,
+      "actual": 0.5520283579826355,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "RM_reward_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.5502, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.5520  (\u0394 = +0.3%)"
+    },
+    {
+      "section": "r0",
+      "metric": "Judge_reward_top10",
+      "expected": 0.5069,
+      "actual": 0.5057505082174357,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Judge_reward_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.5069, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.5058  (\u0394 = +0.2%)"
+    },
+    {
+      "section": "r0",
+      "metric": "Mean_item_mean_top10",
+      "expected": 0.5245,
+      "actual": 0.5255889483486427,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Mean_item_mean_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.5245, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.5256  (\u0394 = +0.2%)"
+    },
+    {
+      "section": "r2",
+      "metric": "NDCG@10",
+      "expected": 0.1305,
+      "actual": 0.13250741983501463,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "NDCG@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1305, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1325  (\u0394 = +1.5%)"
+    },
+    {
+      "section": "r2",
+      "metric": "Recall@10",
+      "expected": 0.2188,
+      "actual": 0.2236,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Recall@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.2188, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.2236  (\u0394 = +2.2%)"
+    },
+    {
+      "section": "r2",
+      "metric": "MAP@10",
+      "expected": 0.1032,
+      "actual": 0.1043520238095238,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "MAP@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1032, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1044  (\u0394 = +1.1%)"
+    },
+    {
+      "section": "r2",
+      "metric": "RM_reward_top10",
+      "expected": 0.5011,
+      "actual": 0.5039134621620178,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "RM_reward_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.5011, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.5039  (\u0394 = +0.6%)"
+    },
+    {
+      "section": "r2",
+      "metric": "Judge_reward_top10",
+      "expected": 0.474,
+      "actual": 0.47294845896318183,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Judge_reward_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.4740, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.4729  (\u0394 = +0.2%)"
+    },
+    {
+      "section": "r2",
+      "metric": "Mean_item_mean_top10",
+      "expected": 0.4731,
+      "actual": 0.4746768381505527,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Mean_item_mean_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.4731, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.4747  (\u0394 = +0.3%)"
+    },
+    {
+      "section": "r3",
+      "metric": "NDCG@10",
+      "expected": 0.1301,
+      "actual": 0.1335294797450536,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "NDCG@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1301, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1335  (\u0394 = +2.6%)"
+    },
+    {
+      "section": "r3",
+      "metric": "Recall@10",
+      "expected": 0.2198,
+      "actual": 0.2266,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Recall@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.2198, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.2266  (\u0394 = +3.1%)"
+    },
+    {
+      "section": "r3",
+      "metric": "MAP@10",
+      "expected": 0.1024,
+      "actual": 0.10485972222222222,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "MAP@10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.1024, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.1049  (\u0394 = +2.4%)"
+    },
+    {
+      "section": "r3",
+      "metric": "RM_reward_top10",
+      "expected": 0.5444,
+      "actual": 0.5465278029441833,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "RM_reward_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.5444, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.5465  (\u0394 = +0.4%)"
+    },
+    {
+      "section": "r3",
+      "metric": "Judge_reward_top10",
+      "expected": 0.5036,
+      "actual": 0.5023978104190969,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Judge_reward_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.5036, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.5024  (\u0394 = +0.2%)"
+    },
+    {
+      "section": "r3",
+      "metric": "Mean_item_mean_top10",
+      "expected": 0.5189,
+      "actual": 0.5201942998089512,
+      "tol": 0.05,
+      "status": "\u0425\u043e\u0440\u043e\u0448\u043e",
+      "msg": "Mean_item_mean_top10: \u043e\u0436\u0438\u0434\u0430\u043b\u043e\u0441\u044c 0.5189, \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u043e 0.5202  (\u0394 = +0.2%)"
+    }
+  ]
+}
